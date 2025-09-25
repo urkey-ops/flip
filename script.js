@@ -1,14 +1,13 @@
 let wordFamilies = {};
 let wordFamilyKeys = [];
 let currentFamilyIndex = 0;
-let currentWordFamily = "";
 let currentIndex = 0;
+let currentWordFamily = "";
 
 const onsetText = document.getElementById("onset-text");
 const wordImage = document.getElementById("word-image");
 const onsetBox = document.getElementById("onset-flip-box");
 
-// Load word families from JSON
 fetch("word-families.json")
   .then(res => res.json())
   .then(data => {
@@ -17,41 +16,40 @@ fetch("word-families.json")
     currentWordFamily = wordFamilyKeys[currentFamilyIndex];
     currentIndex = 0;
     loadInitialWord();
-    setupDropdown(); // optional: for UI family switching
+    setupDropdown(); // optional
   });
 
+function getCurrentWord() {
+  const onset = wordFamilies[currentWordFamily][currentIndex].onset;
+  return onset + currentWordFamily.replace("-", "");
+}
+
 function loadInitialWord() {
-  const word = wordFamilies[currentWordFamily][currentIndex];
-  onsetText.textContent = word.onset;
-  wordImage.src = `images/${word.imageFile}`;
-  playAudio(word.audioFile);
+  const word = getCurrentWord();
+  onsetText.textContent = wordFamilies[currentWordFamily][currentIndex].onset;
+  wordImage.src = `https://source.unsplash.com/300x200/?${word}`;
+  speakWord(word);
 }
 
 function flipWord() {
   onsetBox.onclick = null;
   onsetBox.classList.add("flipping");
 
-  const currentWords = wordFamilies[currentWordFamily];
   currentIndex++;
-
-  if (currentIndex >= currentWords.length) {
+  if (currentIndex >= wordFamilies[currentWordFamily].length) {
     currentFamilyIndex++;
-    if (currentFamilyIndex < wordFamilyKeys.length) {
-      currentWordFamily = wordFamilyKeys[currentFamilyIndex];
-      currentIndex = 0;
-    } else {
+    if (currentFamilyIndex >= wordFamilyKeys.length) {
       currentFamilyIndex = 0;
-      currentWordFamily = wordFamilyKeys[currentFamilyIndex];
-      currentIndex = 0;
     }
+    currentWordFamily = wordFamilyKeys[currentFamilyIndex];
+    currentIndex = 0;
   }
 
-  const nextWord = wordFamilies[currentWordFamily][currentIndex];
-
   setTimeout(() => {
-    onsetText.textContent = nextWord.onset;
-    wordImage.src = `images/${nextWord.imageFile}`;
-    playAudio(nextWord.audioFile);
+    const word = getCurrentWord();
+    onsetText.textContent = wordFamilies[currentWordFamily][currentIndex].onset;
+    wordImage.src = `https://source.unsplash.com/300x200/?${word}`;
+    speakWord(word);
   }, 250);
 
   setTimeout(() => {
@@ -60,12 +58,13 @@ function flipWord() {
   }, 500);
 }
 
-function playAudio(file) {
-  const audio = new Audio(`audio/${file}`);
-  audio.play();
+function speakWord(word) {
+  const utterance = new SpeechSynthesisUtterance(word);
+  utterance.lang = "en-US";
+  speechSynthesis.speak(utterance);
 }
 
-// Optional: Create dropdown to manually switch families
+// Optional dropdown to select family
 function setupDropdown() {
   const selector = document.getElementById("family-selector");
   if (!selector) return;
@@ -79,8 +78,8 @@ function setupDropdown() {
 
   selector.addEventListener("change", () => {
     currentWordFamily = selector.value;
-    currentIndex = 0;
     currentFamilyIndex = wordFamilyKeys.indexOf(currentWordFamily);
+    currentIndex = 0;
     loadInitialWord();
   });
 }
