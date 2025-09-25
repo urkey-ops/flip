@@ -1,36 +1,52 @@
 let wordFamilies = {};
-let currentWordFamily = "-AT";
+let wordFamilyKeys = [];
+let currentFamilyIndex = 0;
+let currentWordFamily = "";
 let currentIndex = 0;
 
-const onsetBox = document.getElementById("onset-flip-box");
 const onsetText = document.getElementById("onset-text");
 const wordImage = document.getElementById("word-image");
+const onsetBox = document.getElementById("onset-flip-box");
 
-// Load JSON file
+// Load word families from JSON
 fetch("word-families.json")
-  .then(response => response.json())
+  .then(res => res.json())
   .then(data => {
     wordFamilies = data;
+    wordFamilyKeys = Object.keys(data);
+    currentWordFamily = wordFamilyKeys[currentFamilyIndex];
+    currentIndex = 0;
     loadInitialWord();
-  })
-  .catch(error => {
-    console.error("Failed to load word families:", error);
+    setupDropdown(); // optional: for UI family switching
   });
 
 function loadInitialWord() {
-  const initialWord = wordFamilies[currentWordFamily][currentIndex];
-  onsetText.textContent = initialWord.onset;
-  wordImage.src = `images/${initialWord.imageFile}`;
-  playAudio(initialWord.audioFile);
+  const word = wordFamilies[currentWordFamily][currentIndex];
+  onsetText.textContent = word.onset;
+  wordImage.src = `images/${word.imageFile}`;
+  playAudio(word.audioFile);
 }
 
 function flipWord() {
   onsetBox.onclick = null;
   onsetBox.classList.add("flipping");
 
-  const words = wordFamilies[currentWordFamily];
-  currentIndex = (currentIndex + 1) % words.length;
-  const nextWord = words[currentIndex];
+  const currentWords = wordFamilies[currentWordFamily];
+  currentIndex++;
+
+  if (currentIndex >= currentWords.length) {
+    currentFamilyIndex++;
+    if (currentFamilyIndex < wordFamilyKeys.length) {
+      currentWordFamily = wordFamilyKeys[currentFamilyIndex];
+      currentIndex = 0;
+    } else {
+      currentFamilyIndex = 0;
+      currentWordFamily = wordFamilyKeys[currentFamilyIndex];
+      currentIndex = 0;
+    }
+  }
+
+  const nextWord = wordFamilies[currentWordFamily][currentIndex];
 
   setTimeout(() => {
     onsetText.textContent = nextWord.onset;
@@ -44,7 +60,27 @@ function flipWord() {
   }, 500);
 }
 
-function playAudio(filename) {
-  const audio = new Audio(`audio/${filename}`);
+function playAudio(file) {
+  const audio = new Audio(`audio/${file}`);
   audio.play();
+}
+
+// Optional: Create dropdown to manually switch families
+function setupDropdown() {
+  const selector = document.getElementById("family-selector");
+  if (!selector) return;
+
+  wordFamilyKeys.forEach(key => {
+    const option = document.createElement("option");
+    option.value = key;
+    option.textContent = key;
+    selector.appendChild(option);
+  });
+
+  selector.addEventListener("change", () => {
+    currentWordFamily = selector.value;
+    currentIndex = 0;
+    currentFamilyIndex = wordFamilyKeys.indexOf(currentWordFamily);
+    loadInitialWord();
+  });
 }
