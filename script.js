@@ -1,85 +1,183 @@
-let wordFamilies = {};
-let wordFamilyKeys = [];
-let currentFamilyIndex = 0;
-let currentIndex = 0;
-let currentWordFamily = "";
+class WordFamilyApp {
+    constructor() {
+        // --- State Variables (Encapsulated) ---
+        this.wordFamilies = {};
+        this.wordFamilyKeys = [];
+        this.currentFamilyIndex = 0;
+        this.currentIndex = 0;
+        
+        // --- DOM Elements ---
+        this.onsetText = document.getElementById("onset-text");
+        this.wordImage = document.getElementById("word-image");
+        this.onsetBox = document.getElementById("onset-flip-box");
+        this.selector = document.getElementById("family-selector");
 
-const onsetText = document.getElementById("onset-text");
-const wordImage = document.getElementById("word-image");
-const onsetBox = document.getElementById("onset-flip-box");
-
-fetch("word-families.json")
-  .then(res => res.json())
-  .then(data => {
-    wordFamilies = data;
-    wordFamilyKeys = Object.keys(data);
-    currentWordFamily = wordFamilyKeys[currentFamilyIndex];
-    currentIndex = 0;
-    loadInitialWord();
-    setupDropdown(); // optional
-  });
-
-function getCurrentWord() {
-  const onset = wordFamilies[currentWordFamily][currentIndex].onset;
-  return onset + currentWordFamily.replace("-", "");
-}
-
-function loadInitialWord() {
-  const word = getCurrentWord();
-  onsetText.textContent = wordFamilies[currentWordFamily][currentIndex].onset;
-  wordImage.src = `https://source.unsplash.com/300x200/?${word}`;
-  speakWord(word);
-}
-
-function flipWord() {
-  onsetBox.onclick = null;
-  onsetBox.classList.add("flipping");
-
-  currentIndex++;
-  if (currentIndex >= wordFamilies[currentWordFamily].length) {
-    currentFamilyIndex++;
-    if (currentFamilyIndex >= wordFamilyKeys.length) {
-      currentFamilyIndex = 0;
+        // --- Initialization ---
+        this.init();
     }
-    currentWordFamily = wordFamilyKeys[currentFamilyIndex];
-    currentIndex = 0;
-  }
 
-  setTimeout(() => {
-    const word = getCurrentWord();
-    onsetText.textContent = wordFamilies[currentWordFamily][currentIndex].onset;
-    wordImage.src = `https://source.unsplash.com/300x200/?${word}`;
-    speakWord(word);
-  }, 250);
+    async init() {
+        if (!this.onsetText || !this.wordImage || !this.onsetBox) {
+            console.error("ERROR: Required DOM elements not found. Check HTML.");
+            return;
+        }
 
-  setTimeout(() => {
-    onsetBox.classList.remove("flipping");
-    onsetBox.onclick = flipWord;
-  }, 500);
+        try {
+            const response = await fetch("word-families.json");
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            
+            this.processData(data);
+            
+            this.loadInitialWord();
+            this.preloadNextImages(5);
+            this.setupDropdown();
+
+            // Set up the main click handler once
+            this.onsetBox.onclick = this.flipWord.bind(this);
+
+        } catch (error) {
+            console.error("Failed to load or process word families data:", error);
+            // Display error to user (e.g., this.onsetText.textContent = "Error Loading Data")
+        }
+    }
+
+    // --- Data Processing and State Setup ---
+
+    processData(data) {
+        this.wordFamilies = data;
+        this.wordFamilyKeys = Object.keys(data);
+        
+        if (this.wordFamilyKeys.length === 0) {
+            console.error("Data loaded but no word families found.");
+            return;
+        }
+
+        // 🔥 OPTIMIZATION: Pre-calculate and store the RIME (suffix) for efficiency
+        for (const key in this.wordFamilies) {
+            this.wordFamilies[key].rime = key.replace(/-/g, "");
+        }
+    }
+
+    getCurrentWordData() {
+        const familyKey = this.wordFamilyKeys[this.currentFamilyIndex];
+        const wordFamily = this.wordFamilies[familyKey];
+        
+        const onset = wordFamily[this.currentIndex].onset;
+        const rime = wordFamily.rime; 
+        
+        return {
+            onset,
+            word: onset + rime
+        };
+    }
+
+    // --- Core UI and Logic Functions ---
+    
+    loadInitialWord() {
+        const { onset, word } = this.getCurrentWordData();
+        
+        this.onsetText.textContent = onset;
+        this.wordImage.src = `https://source.unsplash.com/300x200/?${word}`;
+        this.speakWord(word);
+    }
+
+    flipWord() {
+        // Prevent rapid double-clicks while animating
+        this.onsetBox.onclick = null;
+        this.onsetBox.classList.add("flipping");
+
+        // 1. Advance the index
+        this.currentIndex++;
+        const currentFamilyKey = this.wordFamilyKeys[this.currentFamilyIndex];
+
+        // 2. Check if we need to switch family
+        if (this.currentIndex >= this.wordFamilies[currentFamilyKey].length) {
+            this.currentFamilyIndex = (this.currentFamilyIndex + 1) % this.wordFamilyKeys.length;
+            this.currentIndex = 0;
+        }
+
+        // 3. Preload the next words immediately
+        this.preloadNextImages(5); 
+
+        // 4. Update content after half the animation time (250ms)
+        setTimeout(() => {
+            this.loadInitialWord(); // Loads new word based on updated indices
+        }, 250);
+
+        // 5. Remove animation class and re-enable click after animation is complete (500ms)
+        setTimeout(() => {
+            this.onsetBox.classList.remove("flipping");
+            this.onsetBox.onclick = this.flipWord.bind(this);
+        }, 500);
+    }
+
+    speakWord(word) {
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = "en-US";
+        speechSynthesis.speak(utterance);
+    }
+    
+    // --- Optimization: Preloading ---
+
+    preloadNextImages(count = 5) {
+        let familyIndex = this.currentFamilyIndex;
+        let wordIndex = this.currentIndex;
+        
+        for (let i = 0; i < count; i++) {
+            const familyKey = this.wordFamilyKeys[familyIndex];
+            const familyWords = this.wordFamilies[familyKey];
+            
+            if (wordIndex < familyWords.length) {
+                // Construct the word for preloading
+                const onset = familyWords[wordIndex].onset;
+                const rime = this.wordFamilies[familyKey].rime; 
+                const word = onset + rime;
+                
+                // Trigger image load (cached by the browser)
+                const img = new Image();
+                img.src = `https://source.unsplash.com/300x200/?${word}`;
+                
+                // Move to the next word
+                wordIndex++;
+                
+            } else {
+                // Move to the next family (with wrap-around)
+                familyIndex = (familyIndex + 1) % this.wordFamilyKeys.length;
+                wordIndex = 0;
+                
+                // Stop preloading if we loop back and are at the current word
+                if (familyIndex === this.currentFamilyIndex && wordIndex === this.currentIndex) break;
+            }
+        }
+    }
+
+    // --- Optional Dropdown ---
+    
+    setupDropdown() {
+        if (!this.selector) return;
+
+        this.wordFamilyKeys.forEach(key => {
+            const option = document.createElement("option");
+            option.value = key;
+            option.textContent = key;
+            this.selector.appendChild(option);
+        });
+
+        // Use arrow function to maintain 'this' context
+        this.selector.addEventListener("change", () => {
+            this.currentFamilyIndex = this.wordFamilyKeys.indexOf(this.selector.value);
+            this.currentIndex = 0; // Always reset to the first word
+            
+            this.loadInitialWord();
+            this.preloadNextImages(5);
+        });
+    }
 }
 
-function speakWord(word) {
-  const utterance = new SpeechSynthesisUtterance(word);
-  utterance.lang = "en-US";
-  speechSynthesis.speak(utterance);
-}
-
-// Optional dropdown to select family
-function setupDropdown() {
-  const selector = document.getElementById("family-selector");
-  if (!selector) return;
-
-  wordFamilyKeys.forEach(key => {
-    const option = document.createElement("option");
-    option.value = key;
-    option.textContent = key;
-    selector.appendChild(option);
-  });
-
-  selector.addEventListener("change", () => {
-    currentWordFamily = selector.value;
-    currentFamilyIndex = wordFamilyKeys.indexOf(currentWordFamily);
-    currentIndex = 0;
-    loadInitialWord();
-  });
-}
+// Instantiate the application when the DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    new WordFamilyApp();
+});
