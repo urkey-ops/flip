@@ -1,3 +1,9 @@
+/**
+ * WordFamilyApp
+ * Encapsulates all application logic, state, and DOM manipulation.
+ * Addresses issues with global state, data processing efficiency,
+ * error handling, and implements image preloading.
+ */
 class WordFamilyApp {
     constructor() {
         // --- State Variables (Encapsulated) ---
@@ -5,8 +11,8 @@ class WordFamilyApp {
         this.wordFamilyKeys = [];
         this.currentFamilyIndex = 0;
         this.currentIndex = 0;
-        
-        // --- DOM Elements ---
+
+        // --- DOM Elements (Get references once) ---
         this.onsetText = document.getElementById("onset-text");
         this.wordImage = document.getElementById("word-image");
         this.onsetBox = document.getElementById("onset-flip-box");
@@ -16,48 +22,57 @@ class WordFamilyApp {
         this.init();
     }
 
+    // --- Initialization and Data Loading ---
+
     async init() {
+        // 🛑 CRITICAL CHECK: Ensure all required DOM elements exist
         if (!this.onsetText || !this.wordImage || !this.onsetBox) {
-            console.error("ERROR: Required DOM elements not found. Check HTML.");
+            console.error("ERROR: Required DOM elements (onset-text, word-image, onset-flip-box) not found. Check HTML.");
             return;
         }
 
         try {
             const response = await fetch("word-families.json");
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
             const data = await response.json();
-            
-            this.processData(data);
-            
+
+            this.processData(data); // Process data and set initial state
+
+            // 🛑 CRITICAL CHECK: Ensure we actually have data to work with
+            if (this.wordFamilyKeys.length === 0) {
+                 this.onsetText.textContent = "Error: No words loaded.";
+                 return;
+            }
+
             this.loadInitialWord();
-            this.preloadNextImages(5);
+            this.preloadNextImages(5); // Start preloading the next 5 words
+
             this.setupDropdown();
 
-            // Set up the main click handler once
+            // Set up the main click handler once and use 'bind' to preserve 'this'
             this.onsetBox.onclick = this.flipWord.bind(this);
 
         } catch (error) {
             console.error("Failed to load or process word families data:", error);
-            // Display error to user (e.g., this.onsetText.textContent = "Error Loading Data")
+            this.onsetText.textContent = "Error Loading Data";
         }
     }
 
-    // --- Data Processing and State Setup ---
+    // --- Data Processing and State Helpers ---
 
     processData(data) {
         this.wordFamilies = data;
         this.wordFamilyKeys = Object.keys(data);
         
-        if (this.wordFamilyKeys.length === 0) {
-            console.error("Data loaded but no word families found.");
-            return;
-        }
-
-        // 🔥 OPTIMIZATION: Pre-calculate and store the RIME (suffix) for efficiency
+        // 🔥 OPTIMIZATION: Pre-calculate and store the RIME (suffix) for efficiency.
+        // This avoids repeated string replacement during runtime.
         for (const key in this.wordFamilies) {
-            this.wordFamilies[key].rime = key.replace(/-/g, "");
+            // Check if the family array exists before adding the rime property
+            if (Array.isArray(this.wordFamilies[key])) {
+                this.wordFamilies[key].rime = key.replace(/-/g, "");
+            }
         }
     }
 
@@ -65,6 +80,13 @@ class WordFamilyApp {
         const familyKey = this.wordFamilyKeys[this.currentFamilyIndex];
         const wordFamily = this.wordFamilies[familyKey];
         
+        // 🛑 CRITICAL CHECK: Ensure word exists at the current index
+        if (!wordFamily || !wordFamily[this.currentIndex]) {
+             console.error(`Invalid index ${this.currentIndex} for family ${familyKey}.`);
+             return { onset: "", word: "Error" };
+        }
+        
+        // Use the pre-calculated rime
         const onset = wordFamily[this.currentIndex].onset;
         const rime = wordFamily.rime; 
         
@@ -80,34 +102,38 @@ class WordFamilyApp {
         const { onset, word } = this.getCurrentWordData();
         
         this.onsetText.textContent = onset;
+        
+        // The unstable Unsplash URL is kept, but noted as the potential image failure point.
         this.wordImage.src = `https://source.unsplash.com/300x200/?${word}`;
+        
         this.speakWord(word);
     }
 
     flipWord() {
-        // Prevent rapid double-clicks while animating
+        // Disable click while animating
         this.onsetBox.onclick = null;
         this.onsetBox.classList.add("flipping");
 
-        // 1. Advance the index
+        // 1. Advance the word index
         this.currentIndex++;
         const currentFamilyKey = this.wordFamilyKeys[this.currentFamilyIndex];
 
-        // 2. Check if we need to switch family
+        // 2. Check if we reached the end of the current family
         if (this.currentIndex >= this.wordFamilies[currentFamilyKey].length) {
+            // 🔥 FIX/CHECK: Correctly move to the next family with wrap-around
             this.currentFamilyIndex = (this.currentFamilyIndex + 1) % this.wordFamilyKeys.length;
-            this.currentIndex = 0;
+            this.currentIndex = 0; // Reset word index for the new family
         }
-
-        // 3. Preload the next words immediately
+        
+        // 3. Preload the next set of words immediately after state change
         this.preloadNextImages(5); 
 
-        // 4. Update content after half the animation time (250ms)
+        // 4. Update content after 250ms (mid-flip)
         setTimeout(() => {
             this.loadInitialWord(); // Loads new word based on updated indices
         }, 250);
 
-        // 5. Remove animation class and re-enable click after animation is complete (500ms)
+        // 5. Remove animation class and re-enable click after 500ms
         setTimeout(() => {
             this.onsetBox.classList.remove("flipping");
             this.onsetBox.onclick = this.flipWord.bind(this);
@@ -116,11 +142,11 @@ class WordFamilyApp {
 
     speakWord(word) {
         const utterance = new SpeechSynthesisUtterance(word);
-        utterance.lang = "en-US";
+        utterance.lang = "en-US"; // Language constant
         speechSynthesis.speak(utterance);
     }
     
-    // --- Optimization: Preloading ---
+    // --- Optimization: Image Preloading ---
 
     preloadNextImages(count = 5) {
         let familyIndex = this.currentFamilyIndex;
@@ -136,7 +162,7 @@ class WordFamilyApp {
                 const rime = this.wordFamilies[familyKey].rime; 
                 const word = onset + rime;
                 
-                // Trigger image load (cached by the browser)
+                // Trigger image load (browser caches this image)
                 const img = new Image();
                 img.src = `https://source.unsplash.com/300x200/?${word}`;
                 
@@ -154,7 +180,7 @@ class WordFamilyApp {
         }
     }
 
-    // --- Optional Dropdown ---
+    // --- Optional Dropdown for Navigation ---
     
     setupDropdown() {
         if (!this.selector) return;
@@ -177,7 +203,7 @@ class WordFamilyApp {
     }
 }
 
-// Instantiate the application when the DOM is ready
+// 🚀 Start the application once the entire DOM structure is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new WordFamilyApp();
 });
