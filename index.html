@@ -1,24 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Flip-a-Word Phonics Tool</title>
-    <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flip-a-Word</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div class="container">
-        <div class="word-display">
-            <div id="onset-flip-box">
-                <div id="onset-text">C</div>
-            </div>
-            <div class="rime">at</div>
-        </div>
-        
-        <img id="word-image" src="" alt="Word Image Placeholder" />
+  <div class="container">
+    <h1>Flip-a-Word</h1>
 
-        </div>
+    <!-- Optional Word Family Selector -->
+    <label for="family-selector">Choose a Word Family:</label>
+    <select id="family-selector">
+      <!-- Filled dynamically -->
+    </select>
 
-    <script src="script.js"></script>
+    <!-- Word Display -->
+    <div class="word-display">
+      <div id="onset-flip-box" onclick="flipWord()">
+        <span id="onset-text">C</span>
+      </div>
+      <div class="rime" id="rime-text">at</div>
+    </div>
+
+    <!-- Dynamic Image -->
+    <img id="word-image" src="" alt="Word Image" />
+
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
