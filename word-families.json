@@ -5,22 +5,108 @@
     { "onset": "M", "imageFile": "mat.png", "audioFile": "mat.mp3" },
     { "onset": "H", "imageFile": "hat.png", "audioFile": "hat.mp3" },
     { "onset": "R", "imageFile": "rat.png", "audioFile": "rat.mp3" },
+    { "onset": "P", "imageFile": "pat.png", "audioFile": "pat.mp3" },
     { "onset": "S", "imageFile": "sat.png", "audioFile": "sat.mp3" }
   ],
+  "-AN": [
+    { "onset": "M", "imageFile": "man.png", "audioFile": "man.mp3" },
+    { "onset": "C", "imageFile": "can.png", "audioFile": "can.mp3" },
+    { "onset": "F", "imageFile": "fan.png", "audioFile": "fan.mp3" },
+    { "onset": "P", "imageFile": "pan.png", "audioFile": "pan.mp3" },
+    { "onset": "R", "imageFile": "ran.png", "audioFile": "ran.mp3" },
+    { "onset": "T", "imageFile": "tan.png", "audioFile": "tan.mp3" },
+    { "onset": "V", "imageFile": "van.png", "audioFile": "van.mp3" }
+  ],
+  "-AP": [
+    { "onset": "C", "imageFile": "cap.png", "audioFile": "cap.mp3" },
+    { "onset": "M", "imageFile": "map.png", "audioFile": "map.mp3" },
+    { "onset": "L", "imageFile": "lap.png", "audioFile": "lap.mp3" },
+    { "onset": "N", "imageFile": "nap.png", "audioFile": "nap.mp3" },
+    { "onset": "T", "imageFile": "tap.png", "audioFile": "tap.mp3" },
+    { "onset": "S", "imageFile": "sap.png", "audioFile": "sap.mp3" },
+    { "onset": "Z", "imageFile": "zap.png", "audioFile": "zap.mp3" },
+    { "onset": "CL", "imageFile": "clap.png", "audioFile": "clap.mp3" }
+  ],
+  "-AG": [
+    { "onset": "B", "imageFile": "bag.png", "audioFile": "bag.mp3" },
+    { "onset": "R", "imageFile": "rag.png", "audioFile": "rag.mp3" },
+    { "onset": "T", "imageFile": "tag.png", "audioFile": "tag.mp3" },
+    { "onset": "W", "imageFile": "wag.png", "audioFile": "wag.mp3" },
+    { "onset": "L", "imageFile": "lag.png", "audioFile": "lag.mp3" },
+    { "onset": "S", "imageFile": "sag.png", "audioFile": "sag.mp3" }
+  ],
+  "-IN": [
+    { "onset": "P", "imageFile": "pin.png", "audioFile": "pin.mp3" },
+    { "onset": "T", "imageFile": "tin.png", "audioFile": "tin.mp3" },
+    { "onset": "W", "imageFile": "win.png", "audioFile": "win.mp3" },
+    { "onset": "F", "imageFile": "fin.png", "audioFile": "fin.mp3" },
+    { "onset": "B", "imageFile": "bin.png", "audioFile": "bin.mp3" },
+    { "onset": "D", "imageFile": "din.png", "audioFile": "din.mp3" },
+    { "onset": "Z", "imageFile": "zin.png", "audioFile": "zin.mp3" }
+  ],
+  "-IP": [
+    { "onset": "CH", "imageFile": "chip.png", "audioFile": "chip.mp3" },
+    { "onset": "SH", "imageFile": "ship.png", "audioFile": "ship.mp3" },
+    { "onset": "Z", "imageFile": "zip.png", "audioFile": "zip.mp3" },
+    { "onset": "L", "imageFile": "lip.png", "audioFile": "lip.mp3" },
+    { "onset": "R", "imageFile": "rip.png", "audioFile": "rip.mp3" },
+    { "onset": "T", "imageFile": "tip.png", "audioFile": "tip.mp3" }
+  ],
+  "-OG": [
+    { "onset": "D", "imageFile": "dog.png", "audioFile": "dog.mp3" },
+    { "onset": "H", "imageFile": "hog.png", "audioFile": "hog.mp3" },
+    { "onset": "L", "imageFile": "log.png", "audioFile": "log.mp3" },
+    { "onset": "F", "imageFile": "fog.png", "audioFile": "fog.mp3" },
+    { "onset": "J", "imageFile": "jog.png", "audioFile": "jog.mp3" },
+    { "onset": "B", "imageFile": "bog.png", "audioFile": "bog.mp3" }
+  ],
+  "-OT": [
+    { "onset": "C", "imageFile": "cot.png", "audioFile": "cot.mp3" },
+    { "onset": "D", "imageFile": "dot.png", "audioFile": "dot.mp3" },
+    { "onset": "H", "imageFile": "hot.png", "audioFile": "hot.mp3" },
+    { "onset": "L", "imageFile": "lot.png", "audioFile": "lot.mp3" },
+    { "onset": "N", "imageFile": "not.png", "audioFile": "not.mp3" },
+    { "onset": "P", "imageFile": "pot.png", "audioFile": "pot.mp3" },
+    { "onset": "R", "imageFile": "rot.png", "audioFile": "rot.mp3" }
+  ],
+  "-UG": [
+    { "onset": "B", "imageFile": "bug.png", "audioFile": "bug.mp3" },
+    { "onset": "J", "imageFile": "jug.png", "audioFile": "jug.mp3" },
+    { "onset": "H", "imageFile": "hug.png", "audioFile": "hug.mp3" },
+    { "onset": "M", "imageFile": "mug.png", "audioFile": "mug.mp3" },
+    { "onset": "R", "imageFile": "rug.png", "audioFile": "rug.mp3" },
+    { "onset": "T", "imageFile": "tug.png", "audioFile": "tug.mp3" },
+    { "onset": "P", "imageFile": "pug.png", "audioFile": "pug.mp3" }
+  ],
   "-ASH": [
-    { "onset": "C", "imageFile": "cash.png", "audioFile": "cash.mp3" },
-    { "onset": "D", "imageFile": "dash.png", "audioFile": "dash.mp3" },
     { "onset": "M", "imageFile": "mash.png", "audioFile": "mash.mp3" },
-    { "onset": "L", "imageFile": "lash.png", "audioFile": "lash.mp3" },
-    { "onset": "CR", "imageFile": "crash.png", "audioFile": "crash.mp3" },
-    { "onset": "FL", "imageFile": "flash.png", "audioFile": "flash.mp3" }
+    { "onset": "D", "imageFile": "dash.png", "audioFile": "dash.mp3" },
+    { "onset": "C", "imageFile": "cash.png", "audioFile": "cash.mp3" },
+    { "onset": "SM", "imageFile": "smash.png", "audioFile": "smash.mp3" },
+    { "onset": "CR", "imageFile": "crash.png", "audioFile": "crash.mp3" }
+  ],
+  "-ACK": [
+    { "onset": "P", "imageFile": "pack.png", "audioFile": "pack.mp3" },
+    { "onset": "R", "imageFile": "rack.png", "audioFile": "rack.mp3" },
+    { "onset": "S", "imageFile": "sack.png", "audioFile": "sack.mp3" },
+    { "onset": "L", "imageFile": "lack.png", "audioFile": "lack.mp3" },
+    { "onset": "J", "imageFile": "jack.png", "audioFile": "jack.mp3" },
+    { "onset": "T", "imageFile": "tack.png", "audioFile": "tack.mp3" }
+  ],
+  "-ILL": [
+    { "onset": "CH", "imageFile": "chill.png", "audioFile": "chill.mp3" },
+    { "onset": "D", "imageFile": "dill.png", "audioFile": "dill.mp3" },
+    { "onset": "GR", "imageFile": "grill.png", "audioFile": "grill.mp3" },
+    { "onset": "P", "imageFile": "pill.png", "audioFile": "pill.mp3" },
+    { "onset": "S", "imageFile": "sill.png", "audioFile": "sill.mp3" },
+    { "onset": "T", "imageFile": "till.png", "audioFile": "till.mp3" }
   ],
   "-AKE": [
-    { "onset": "C", "imageFile": "cake.png", "audioFile": "cake.mp3" },
     { "onset": "B", "imageFile": "bake.png", "audioFile": "bake.mp3" },
+    { "onset": "C", "imageFile": "cake.png", "audioFile": "cake.mp3" },
+    { "onset": "F", "imageFile": "fake.png", "audioFile": "fake.mp3" },
     { "onset": "M", "imageFile": "make.png", "audioFile": "make.mp3" },
-    { "onset": "T", "imageFile": "take.png", "audioFile": "take.mp3" },
-    { "onset": "L", "imageFile": "lake.png", "audioFile": "lake.mp3" },
-    { "onset": "R", "imageFile": "rake.png", "audioFile": "rake.mp3" }
+    { "onset": "R", "imageFile": "rake.png", "audioFile": "rake.mp3" },
+    { "onset": "T", "imageFile": "take.png", "audioFile": "take.mp3" }
   ]
 }
