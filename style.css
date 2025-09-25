@@ -1,0 +1,57 @@
+/* General Page Styling */
+body {
+  background-color: #fcefe3;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  text-align: center;
+  padding: 50px 20px;
+  margin: 0;
+}
+
+.container {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Word Display */
+.word-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 30px;
+  perspective: 1000px;
+}
+
+#onset-flip-box {
+  background-color: #ffcc70;
+  color: #333;
+  font-size: 72px;
+  font-weight: bold;
+  width: 120px;
+  height: 100px;
+  line-height: 100px;
+  margin-right: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.5s;
+  transform-style: preserve-3d;
+  user-select: none;
+}
+
+#onset-flip-box.flipping {
+  transform: rotateY(180deg);
+}
+
+.rime {
+  font-size: 72px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Word Image */
+#word-image {
+  width: 200px;
+  height: auto;
+  border: 3px solid #ffcc70;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
